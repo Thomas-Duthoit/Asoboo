@@ -33,6 +33,8 @@ project(Asoboo C CXX ASM)
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
+add_subdirectory(no-OS-FatFS-SD-SPI-RPi-Pico/FatFs_SPI)
+
 # Add executable. Default name is the project name, version 0.1
 add_executable(Asoboo main.c )
 
@@ -46,12 +48,14 @@ pico_enable_stdio_usb(Asoboo 1)
 # Add the standard library to the build
 target_link_libraries(Asoboo
         pico_stdlib
-        hardware_spi)
+        hardware_spi
+        FatFs_SPI)
 
 # Add the standard include files to the build
 target_include_directories(Asoboo PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
         "include/"
+        no-OS-FatFS-SD-SPI-RPi-Pico/FatFs_SPI/include
 )
 
 
