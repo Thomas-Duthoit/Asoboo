@@ -3,6 +3,9 @@
 #include "pico/stdlib.h"
 
 
+// All the hardware connections and baudrates are specified here
+
+
 // BUTTONS
 #define PIN_BTN_A     14
 #define PIN_BTN_B     13
@@ -23,7 +26,7 @@
 #define SPI_PORT     spi0
 #define SPI_BAUDRATE         62.5 * 1000 * 1000       // 62.5 Mhz
 #define SPI_SD_INIT_BAUDRATE 100 * 1000               // 100 kHz
-#define SPI_SD_READ_BAUDRATE 5 * 1000 * 1000         // 5 MHz
+#define SPI_SD_READ_BAUDRATE 5 * 1000 * 1000          // 5 MHz
 
 
 // SCREEN
