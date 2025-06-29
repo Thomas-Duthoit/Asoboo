@@ -23,7 +23,7 @@
 #define SPI_PORT     spi0
 #define SPI_BAUDRATE         62.5 * 1000 * 1000       // 62.5 Mhz
 #define SPI_SD_INIT_BAUDRATE 100 * 1000               // 100 kHz
-#define SPI_SD_READ_BAUDRATE 25 * 1000 * 1000         // 25 MHz
+#define SPI_SD_READ_BAUDRATE 5 * 1000 * 1000         // 5 MHz
 
 
 // SCREEN

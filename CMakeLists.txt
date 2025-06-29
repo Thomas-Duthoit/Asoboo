@@ -59,3 +59,17 @@ target_include_directories(Asoboo PRIVATE
 
 
 pico_add_extra_outputs(Asoboo)
+
+
+
+
+# FatFS LIB :
+target_sources(Asoboo PRIVATE
+    lib/FatFs/src/ff.c
+    lib/FatFs/src/diskio.c
+    lib/FatFs/src/ffunicode.c
+)
+
+target_include_directories(Asoboo PRIVATE
+    lib/FatFS/src
+)
