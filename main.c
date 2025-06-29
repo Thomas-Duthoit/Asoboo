@@ -1,23 +1,62 @@
-#include "os.h"
+#include "pico/stdlib.h"
+#include "init_hardware.h"
+#include "ff.h"
+#include "bootloader.h"
+
+
+FATFS fs;
+DIR dir;
+FILINFO fno;
+FIL file;
+char buffer[128];  // buffer for temp read
+UINT br;
+
+void handle_fatal_error();
 
 int main() {
     stdio_init_all();
+    init_hardware();
+
+    stdio_printf("Asoboo start\n");
+
+    FRESULT fr = f_mount(&fs, "", 1);
+    if (fr != FR_OK) {
+        stdio_printf("Failed to mount : %d\n", fr);
+        handle_fatal_error();
+    } else {
+        stdio_printf("Card mounted ! Listing root:\n");
+
+        fr = f_opendir(&dir, "/");
+        if (fr == FR_OK) {
+            while (1) {
+                fr = f_readdir(&dir, &fno);
+                if (fr != FR_OK || fno.fname[0] == 0) break;
+                if (fno.fattrib & AM_DIR) {
+                    stdio_printf("[DIR]  %s\n", fno.fname);
+                }
+                else {
+                    stdio_printf("[FILE] %s (%lu bytes)\n", fno.fname, fno.fsize);
+                }
+
+            }
+            f_closedir(&dir);
+        } else {
+            stdio_printf("Failed to open dir \"/\": %d\n", fr);
+            handle_fatal_error();
+        }
+
+
+        load_game("game.bin");
+    }
+
     
-    os_init();
 
-    sleep_ms(1000);  // 1000 ms d'attente pour voir le boot screen
-
-    os_main_menu();
-
-    sleep_ms(1000);
-    
-    // os_run_game(GAMES.games[0]);
-
-    // g_fill_rect(0, 0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1, CYAN);
-
-    while (1) {
+    while (true) {
         tight_loop_contents();
     }
-    
-    return 0;
+}
+
+void handle_fatal_error() {
+    stdio_printf(">>> FATAL ERROR");
+    // TODO: add something like a reboot
 }

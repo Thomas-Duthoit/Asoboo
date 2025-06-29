@@ -6,11 +6,7 @@
 #include "layout.h"
 #include "driver_screen.h"
 #include "driver_btn.h"
-#include "fatfs.h"
-#include "graph.h"
 #include "hardware/watchdog.h"
-
-#include "boot_image.h"
 
 
 
@@ -75,24 +71,24 @@ void init_hardware() {
     // Reset + Allumage
     // uint16_t img[SCREEN_WIDTH*SCREEN_HEIGHT] = _BOOT_IMAGE;
     // g_draw_buffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, img);
-    _render_boot_img();
+    // _render_boot_img();
     screen_backlight(1);
 
 
     // uSD
-    if (!init_fatfs()) {
-        spi_init(SPI_PORT, SPI_BAUDRATE);
-        // g_fill_rect(0, 0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1, RED);
-        // g_fill_rect(2, 2, SCREEN_WIDTH-3, SCREEN_HEIGHT-3, BLACK);
-        g_draw_string(5, 5, "ERROR:", RED, BLACK);
-        g_draw_string(5+FONT_WIDTH*7, 5, "NO SD CARD", WHITE, BLACK);
-        g_draw_string(5, 5+FONT_HEIGHT, "<HOME> TO RETRY", WHITE, BLACK);
+    // if (!init_fatfs()) {
+    //     spi_init(SPI_PORT, SPI_BAUDRATE);
+    //     // g_fill_rect(0, 0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1, RED);
+    //     // g_fill_rect(2, 2, SCREEN_WIDTH-3, SCREEN_HEIGHT-3, BLACK);
+    //     g_draw_string(5, 5, "ERROR:", RED, BLACK);
+    //     g_draw_string(5+FONT_WIDTH*7, 5, "NO SD CARD", WHITE, BLACK);
+    //     g_draw_string(5, 5+FONT_HEIGHT, "<HOME> TO RETRY", WHITE, BLACK);
 
-        while (1) {
-            tight_loop_contents();
+    //     while (1) {
+    //         tight_loop_contents();
 
-            if (get_btn_state(PIN_BTN_HOME)) watchdog_reboot(0, 0, 0);
-        }
-    }
+    //         if (get_btn_state(PIN_BTN_HOME)) watchdog_reboot(0, 0, 0);
+    //     }
+    // }
 }
 #endif

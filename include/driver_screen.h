@@ -22,8 +22,8 @@
 #define CMD_COLMOD   0x3A
 
 
-bool init_screen();
-void screen_backlight(bool backlight);
+char init_screen();
+void screen_backlight(char backlight);
 void screen_write_command(uint8_t cmd);
 void screen_write_data(uint8_t *data, size_t len);
 
@@ -43,13 +43,13 @@ void screen_write_data(uint8_t *data, size_t len) {
     cs_no_select();
 }
 
-void screen_backlight(bool backlight) {
+void screen_backlight(char backlight) {
     gpio_put(PIN_BL, backlight);
 }
 
 
 
-bool init_screen() {
+char init_screen() {
     uint8_t data[4];
 
     gpio_put(PIN_RST, 0);

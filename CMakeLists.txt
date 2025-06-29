@@ -33,8 +33,11 @@ project(Asoboo C CXX ASM)
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
+
 # Add executable. Default name is the project name, version 0.1
-add_executable(Asoboo main.c )
+add_executable(Asoboo 
+    main.c
+)
 
 pico_set_program_name(Asoboo "Asoboo")
 pico_set_program_version(Asoboo "0.1")
@@ -56,3 +59,17 @@ target_include_directories(Asoboo PRIVATE
 
 
 pico_add_extra_outputs(Asoboo)
+
+
+
+
+# FatFS LIB :
+target_sources(Asoboo PRIVATE
+    lib/FatFs/src/ff.c
+    lib/FatFs/src/diskio.c
+    lib/FatFs/src/ffunicode.c
+)
+
+target_include_directories(Asoboo PRIVATE
+    lib/FatFS/src
+)
