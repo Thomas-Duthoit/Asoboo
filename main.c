@@ -1,12 +1,15 @@
 #include "pico/stdlib.h"
 #include "init_hardware.h"
 #include "ff.h"
+#include "bootloader.h"
 
 
 FATFS fs;
 DIR dir;
 FILINFO fno;
-
+FIL file;
+char buffer[128];  // buffer for temp read
+UINT br;
 
 void handle_fatal_error();
 
@@ -28,16 +31,22 @@ int main() {
             while (1) {
                 fr = f_readdir(&dir, &fno);
                 if (fr != FR_OK || fno.fname[0] == 0) break;
-                if (fno.fattrib & AM_DIR)
+                if (fno.fattrib & AM_DIR) {
                     stdio_printf("[DIR]  %s\n", fno.fname);
-                else
+                }
+                else {
                     stdio_printf("[FILE] %s (%lu bytes)\n", fno.fname, fno.fsize);
+                }
+
             }
             f_closedir(&dir);
         } else {
             stdio_printf("Failed to open dir \"/\": %d\n", fr);
             handle_fatal_error();
         }
+
+
+        load_game("game.bin");
     }
 
     

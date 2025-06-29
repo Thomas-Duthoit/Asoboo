@@ -3,10 +3,10 @@
 
 #include "pico/stdlib.h"
 
-bool get_btn_state(uint32_t button);
+char get_btn_state(uint32_t button);
 
 
 
-bool get_btn_state(uint32_t button) { return !gpio_get(button); }
+char get_btn_state(uint32_t button) { return !gpio_get(button); }
 
 #endif
