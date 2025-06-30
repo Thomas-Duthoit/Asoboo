@@ -60,7 +60,7 @@ char init_screen() {
     screen_write_command(CMD_SWRESET);
     sleep_ms(150);
     screen_write_command(CMD_SLPOUT);
-    sleep_ms(500);
+    sleep_ms(500);  // TODO: check without to see if boot time can be shortened
 
     // Frame Rate Control
     screen_write_command(0xB1);
@@ -111,6 +111,6 @@ char init_screen() {
 
     // Turn on the display
     screen_write_command(CMD_DISPON);
-    sleep_ms(1500);
+    sleep_ms(1500); // TODO: check without to see if boot time can be shortened
 }
 #endif
