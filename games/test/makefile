@@ -1,4 +1,4 @@
-ARGET = game
+TARGET = game
 SRC = $(TARGET).c
 
 # Toolchain ARM

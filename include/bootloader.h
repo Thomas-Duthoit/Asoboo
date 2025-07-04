@@ -3,6 +3,7 @@
 
 #include "os_api.h"
 #include "init_hardware.h"
+#include "graph.h"
 #include "ff.h"
 
 
@@ -10,8 +11,18 @@
 #define GAME_CODE_MAX_SIZE 0x00010000  // 64 Ko
 
 os_api_t os_api_table = {  // Assigning functions to the shared funnctions table
-    .print = stdio_printf,
-    .bl = screen_backlight
+    .print_serial = stdio_printf,
+    .backlight_state = screen_backlight,
+
+    .flush_render_buffer = graph_flush_render_buffer,
+
+    .set_px = graph_set_px,
+    .get_px = graph_get_px,
+
+    .put_sprite = graph_put_sprite,
+    .get_btn = get_btn_state,
+
+    .get_rand_32 = NULL,
 };
 
 // load and execute the binary located at the given path

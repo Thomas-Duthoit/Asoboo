@@ -2,7 +2,7 @@
 
 __attribute__((used)) __attribute__((section(".text.game_main")))
 void game_main(os_api_t* api) {
-    api->bl(0);
-    api->print("test n°%d\n", 0);
+    api->backlight_state(0);
+    api->print_serial("test n°%d\n", 1);
     return;
 }
