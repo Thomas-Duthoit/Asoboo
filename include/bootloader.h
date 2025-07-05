@@ -44,6 +44,9 @@ void load_game(const char* path) {
     // For Thumb (which is needed for the pico), add 1 to the address
     game_main = (void (*)(os_api_t *))(GAME_CODE_ADDR | 1);
 
+    // Clear and flush render buffer
+    graph_fill_rect(0, 0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1, 0);
+    graph_flush_render_buffer();
     /* Small manipulation in assembly :
         To prevent the game code located in ram from beeing corrupted by the stack, we move the stack pointer below the game address.
         When the game execution has ended, the stack is restored.

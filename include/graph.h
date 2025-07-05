@@ -58,6 +58,20 @@ void graph_put_sprite (const uint16_t x_pos, const uint16_t y_pos, const uint16_
     }
 }
 
+void graph_fill_rect (const uint16_t x_pos, const uint16_t y_pos, const uint16_t width, const uint16_t height, const uint16_t color) {
+    for (uint16_t y = 0; y < height; y++) {
+        uint16_t screen_y = y_pos + y;
+        if (screen_y >= SCREEN_HEIGHT) continue; // Avoid vertical overflow
+
+        for (uint16_t x = 0; x < width; x++) {
+            uint16_t screen_x = x_pos + x;
+            if (screen_x >= SCREEN_WIDTH) continue; // Avoid horizontal overflow
+
+            render_buffer[get_buff_idx(screen_x, screen_y)] = color;
+        }
+    }
+}
+
 
 
 #endif //  GRAPH_H
