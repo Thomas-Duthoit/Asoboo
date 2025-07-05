@@ -1,0 +1,26 @@
+# --- START OF FILE Makefile.qemu (Version corrigée) ---
+
+# Cross-compilateur pour Linux tournant sur ARM
+# C'est la correction clé. On n'utilise plus arm-none-eabi-gcc.
+CC = arm-linux-gnueabihf-gcc
+
+# Flags de compilation. -static est toujours une bonne idée pour que QEMU n'ait pas
+# à chercher de bibliothèques partagées.
+CFLAGS = -Wall -Wextra -g -static
+
+# Nom de l'exécutable du harness
+TARGET = qemu_harness
+
+# Fichiers sources à compiler
+SOURCES = qemu_harness.c
+
+# Règle par défaut
+all: $(TARGET)
+
+$(TARGET): $(SOURCES) os_api.h
+	$(CC) $(CFLAGS) -o $(TARGET) $(SOURCES)
+
+clean:
+	rm -f $(TARGET)
+
+.PHONY: all clean

@@ -1,23 +1,8 @@
-
-// Minimal Asoboo game binary entry point
 #include "os_api.h"
 
 
-// Forward declaration of game_main (called from _start)
-__attribute__((used)) __attribute__((section(".text.game_main"))) __attribute__((noreturn))
-void game_main(os_api_t* api);
-
-
-// Minimal startup: pass API pointer to game_main, then halt
-__attribute__((section(".text._start")))
-void _start(void) {
-    os_api_t* api = (os_api_t*)0x20020000; // API table address fixed by emulator
-    game_main(api); // never returns
-    while (1) { __asm__ volatile ("nop"); } // safety loop
-}
-
 // Main game entry: called by _start with valid API pointer
-__attribute__((used)) __attribute__((section(".text.game_main"))) __attribute__((noreturn))
+__attribute__((used)) __attribute__((section(".text.game_main")))
 void game_main(os_api_t* api) {
 
     // Draw a single white diagonal line using Bresenham's algorithm
@@ -35,4 +20,7 @@ void game_main(os_api_t* api) {
         if (e2 > -dy) { err -= dy; x0 += sx; }
         if (e2 < dx)  { err += dx; y0 += sy; }
     }
+
+    api->flush_render_buffer();
+    return;
 }

@@ -7,11 +7,8 @@ LD = arm-none-eabi-ld
 OBJCOPY = arm-none-eabi-objcopy
 
 # Flags
-# -T linker.ld: use custom linker script to ensure _start is first in .text
-# --gc-sections: remove unused sections
-# --undefined=_start: force linker to keep _start symbol
 CFLAGS = -mcpu=cortex-m0plus -mthumb -nostdlib -ffreestanding -Wall -Os
-LDFLAGS = -T linker.ld --gc-sections --undefined=_start
+LDFLAGS = -Ttext=0x20030000 --gc-sections
 
 all: $(TARGET).bin
 
@@ -19,7 +16,7 @@ $(TARGET).o: $(SRC) os_api.h
 	$(CC) $(CFLAGS) -c $(SRC) -o $@
 
 $(TARGET).elf: $(TARGET).o
-	$(LD) $(LDFLAGS) $< -o $@ --entry=_start
+	$(LD) $(LDFLAGS) $< -o $@ --entry=game_main
 
 $(TARGET).bin: $(TARGET).elf
 	$(OBJCOPY) -O binary $< $@
