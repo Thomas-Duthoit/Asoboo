@@ -43,7 +43,13 @@ void emu_set_px(const uint16_t x_pos, const uint16_t y_pos, const uint16_t color
 }
 
 uint16_t emu_get_px(const uint16_t x_pos, const uint16_t y_pos) {
-    printf("[DBG API_CALL] get_px(x: %u, y: %u)\n", x_pos, y_pos);
+    printf("API:get_px:%u,%u)\n", x_pos, y_pos);
+
+    char response_buffer[16];
+    if (fgets(response_buffer, sizeof(response_buffer), stdin) != NULL) {
+        uint16_t color = (uint16_t)strtol(response_buffer, NULL, 10);
+        return color;
+    }
     return 0;
 }
 
@@ -67,7 +73,6 @@ char emu_get_btn(const uint32_t button) {
 // MISC
 uint32_t emu_get_rand_32(void) {
     printf("API:get_rand_32\n");
-    // TODO: finish
     return rand();
 }
 

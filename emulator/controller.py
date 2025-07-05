@@ -54,10 +54,10 @@ render_buffer.fill((0, 0, 0))
 
 
 
-def _rgb565_to_rgrb888(color):
-    r_5 = (color >> 11) & 0x1F
+def _bgr565_to_rgb888(color):
+    b_5 = (color >> 11) & 0x1F
     g_6 = (color >> 5) & 0x3F
-    b_5 = color & 0x1F
+    r_5 = color & 0x1F
     r_8 = (r_5 * 255) // 31
     g_8 = (g_6 * 255) // 63
     b_8 = (b_5 * 255) // 31
@@ -77,7 +77,7 @@ def parse_line(line):
         
         if api_call == "set_px":
             x, y, color = map(int, args[0].split(','))
-            render_buffer.set_at((x, y), _rgb565_to_rgrb888(color))
+            render_buffer.set_at((x, y), _bgr565_to_rgb888(color))
             return;
         elif api_call == "flush":
             root.blit(render_buffer, (0, 0))
