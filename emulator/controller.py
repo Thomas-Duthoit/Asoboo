@@ -5,7 +5,7 @@ import sys
 import pygame
 
 
-GAME_BIN_PATH = "../games/test_emu/game.bin"
+GAME_BIN_PATH = "../games/gradient/game.bin"
 HARNESS_EXECUTABLE = "./qemu_harness"
 QEMU_COMMAND = ["qemu-arm", "-L", "/usr/arm-linux-gnueabihf/", HARNESS_EXECUTABLE, GAME_BIN_PATH]
 
@@ -54,22 +54,22 @@ render_buffer.fill((0, 0, 0))
 
 
 
-def _bgr565_to_rgb888(color):
-    b_5 = (color >> 11) & 0x1F
+def _rgb565_to_rgb888(color):
+    r_5 = (color >> 11) & 0x1F
     g_6 = (color >> 5) & 0x3F
-    r_5 = color & 0x1F
+    b_5 = color & 0x1F
     r_8 = (r_5 * 255) // 31
     g_8 = (g_6 * 255) // 63
     b_8 = (b_5 * 255) // 31
 
     return (r_8, g_8, b_8)
 
-def _rgb888_to_bgr565(rgb_tuple: tuple[int, int, int]) -> int:
+def _rgb888_to_rgb565(rgb_tuple: tuple[int, int, int]) -> int:
     r, g, b = rgb_tuple
     r_5 = (r * 31) // 255
     g_6 = (g * 63) // 255
     b_5 = (b * 31) // 255
-    bgr565_color = (b_5 << 11) | (g_6 << 5) | r_5
+    bgr565_color = (r_5 << 11) | (g_6 << 5) | b_5
 
     return bgr565_color
 
@@ -79,6 +79,8 @@ def parse_line(line):
     
     parts = line.strip().split(':')
     command = parts[0]
+
+    print(GREEN + f"[DBG]: {line.strip()} ", END)
     
     if command == "API":
         api_call = parts[1]
@@ -86,7 +88,7 @@ def parse_line(line):
         
         if api_call == "set_px":
             x, y, color = map(int, args[0].split(','))
-            render_buffer.set_at((x, y), _bgr565_to_rgb888(color))
+            render_buffer.set_at((x, y), _rgb565_to_rgb888(color))
             return
         elif api_call == "flush":
             root.blit(pygame.transform.scale2x(pygame.transform.scale2x(render_buffer)), (0, 0))
@@ -116,7 +118,7 @@ def parse_line(line):
             if render_buffer.get_rect().collidepoint(x, y):
                 color_888 = render_buffer.get_at((x, y))[:3] # [:3] to ignore the alpha value
             
-            color_16bit = _rgb888_to_bgr565(color_888)
+            color_16bit = _rgb888_to_rgb565(color_888)
 
             response = f"{color_16bit}\n"
             process.stdin.write(response)

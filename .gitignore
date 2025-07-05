@@ -398,3 +398,10 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+emulator/qemu_harness
+games/gradient/game.bin
+games/gradient/game.elf
+games/gradient/game.o
+games/test_emu/game.elf
+games/test_emu/game.o
+games/test_emu/game.bin
