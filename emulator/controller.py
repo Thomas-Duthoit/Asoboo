@@ -44,7 +44,7 @@ BUTTONS_MAPPING = {
 
 
 pygame.init()
-root = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+root = pygame.display.set_mode((SCREEN_WIDTH*4, SCREEN_HEIGHT*4))
 pygame.display.set_caption("Asoboo Emulator")
 key_state = {}
 
@@ -80,13 +80,13 @@ def parse_line(line):
             render_buffer.set_at((x, y), _bgr565_to_rgb888(color))
             return;
         elif api_call == "flush":
-            root.blit(render_buffer, (0, 0))
+            root.blit(pygame.transform.scale2x(pygame.transform.scale2x(render_buffer)), (0, 0))
             pygame.display.update()
             return;
         elif api_call == "backlight":
             state = args[0]
             if (state):
-                root.blit(render_buffer, (0, 0))
+                root.blit(pygame.transform.scale2x(pygame.transform.scale2x(render_buffer)), (0, 0))
                 pygame.display.update()
             else:
                 root.fill("black")
