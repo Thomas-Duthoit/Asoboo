@@ -64,6 +64,15 @@ def _bgr565_to_rgb888(color):
 
     return (r_8, g_8, b_8)
 
+def _rgb888_to_bgr565(rgb_tuple: tuple[int, int, int]) -> int:
+    r, g, b = rgb_tuple
+    r_5 = (r * 31) // 255
+    g_6 = (g * 63) // 255
+    b_5 = (b * 31) // 255
+    bgr565_color = (b_5 << 11) | (g_6 << 5) | r_5
+
+    return bgr565_color
+
 
 
 def parse_line(line):
@@ -78,11 +87,11 @@ def parse_line(line):
         if api_call == "set_px":
             x, y, color = map(int, args[0].split(','))
             render_buffer.set_at((x, y), _bgr565_to_rgb888(color))
-            return;
+            return
         elif api_call == "flush":
             root.blit(pygame.transform.scale2x(pygame.transform.scale2x(render_buffer)), (0, 0))
             pygame.display.update()
-            return;
+            return
         elif api_call == "backlight":
             state = args[0]
             if (state):
@@ -91,13 +100,29 @@ def parse_line(line):
             else:
                 root.fill("black")
                 pygame.display.update()
-            return;
+            return
         elif api_call == "get_btn":
             if key_state[BUTTONS_MAPPING[int(args[0])]]:
                 process.stdin.write("1\n")
             else:
                 process.stdin.write("0\n")
             process.stdin.flush()
+            return
+
+        elif api_call == "get_px":
+            x, y = map(int, parts[2].split(','))
+                
+            color_888 = (0, 0, 0)
+            if render_buffer.get_rect().collidepoint(x, y):
+                color_888 = render_buffer.get_at((x, y))[:3] # [:3] to ignore the alpha value
+            
+            color_16bit = _rgb888_to_bgr565(color_888)
+
+            response = f"{color_16bit}\n"
+            process.stdin.write(response)
+            process.stdin.flush()
+            return
+        
     elif command == "CTL":
         status = parts[1]
         if status == "ready":
@@ -105,7 +130,7 @@ def parse_line(line):
         elif status == "done":
             print(RED + "[CMD] CTL : Game execution is done" + END)
         
-        return;
+        return
 
     else:
         # we print the line in gray
