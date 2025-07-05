@@ -1,19 +1,18 @@
-// --- START OF FILE qemu_harness.c ---
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <sys/mman.h> // Pour mmap, afin d'allouer de la mémoire exécutable
+#include <sys/mman.h>
 #include "os_api.h"
 
-// =================================================================
-// Implémentations simulées ("mock") des fonctions de l'API de l'OS
-// Ces fonctions sont appelées par le code ARM de game.bin
-// =================================================================
+/*
+USAGE: qemu-arm ./qemu_harness path_to_game.bin
+COMPILATION : make -f Makefile.qemu
+*/
 
+#pragma region OS_API_FUNCTIONS
 // DEBUG / HW
-// QEMU redirigera ce printf vers la console du PC hôte
+// QEMU will redirect the printf to the user shell
 int emu_print_serial(const char *format, ...) {
     va_list args;
     va_start(args, format);
@@ -48,7 +47,7 @@ void emu_put_sprite(const uint16_t x_pos, const uint16_t y_pos, const uint16_t w
 // INPUTS
 char emu_get_btn(const uint32_t button) {
     printf("[API_CALL] get_btn(button_pin: %u)\n", button);
-    return 0; // Toujours non pressé
+    return 0;
 }
 
 // MISC
@@ -57,10 +56,10 @@ uint32_t emu_get_rand_32(void) {
     return rand();
 }
 
-// =================================================================
-// Point d'entrée du harness (sera lancé par qemu-arm)
-// =================================================================
+#pragma endregion
 
+
+// Emulator entry point, which will be ran by QEMU
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <path_to_game.bin>\n", argv[0]);
@@ -71,9 +70,9 @@ int main(int argc, char *argv[]) {
     void* game_code_buffer = NULL;
     long file_size = 0;
 
-    printf("--- QEMU ARM Harness pour Asoboo ---\n");
+    printf("[ QEMU ARM Harness - Asoboo ]\n");
 
-    // Définition de la table d'API avec nos fonctions simulées
+    // OS api table definition, function assignement
     os_api_t emu_api_table = {
         .print_serial = emu_print_serial,
         .backlight_state = emu_backlight_state,
@@ -85,10 +84,10 @@ int main(int argc, char *argv[]) {
         .get_rand_32 = emu_get_rand_32,
     };
     
-    // 1. Ouvrir et lire le binaire du jeu
+    // Open binary file
     game_file = fopen(game_path, "rb");
     if (!game_file) {
-        perror("Erreur: Impossible d'ouvrir le fichier du jeu");
+        perror("ERROR: Unable to open the game file");
         return 1;
     }
 
@@ -97,57 +96,50 @@ int main(int argc, char *argv[]) {
     fseek(game_file, 0, SEEK_SET);
 
     if (file_size <= 0) {
-        fprintf(stderr, "Erreur: Fichier de jeu vide ou invalide.\n");
+        fprintf(stderr, "ERROR: Empty or invalid game file\n");
         fclose(game_file);
         return 1;
     }
-    printf("Lecture de '%s' (%ld bytes)...\n", game_path, file_size);
+    printf("Reading '%s' (%ld bytes)...\n", game_path, file_size);
 
-    // 2. Allouer de la mémoire EXÉCUTABLE pour le code du jeu
-    // C'est crucial. malloc() alloue de la mémoire non-exécutable par sécurité (NX bit).
-    // Nous devons utiliser mmap() pour demander explicitement la permission d'exécuter.
+    // Allow executable memory for the game code
+    // malloc allows non-executable memory, so we need to use mmap
     game_code_buffer = mmap(
-        NULL, // Laisse le système choisir l'adresse
-        file_size, // Taille de la région
-        PROT_READ | PROT_WRITE | PROT_EXEC, // Permissions: lecture, écriture, EXÉCUTION
-        MAP_PRIVATE | MAP_ANONYMOUS, // Mapping privé et anonyme
+        NULL, // The system choose the adress
+        file_size, // Region size
+        PROT_READ | PROT_WRITE | PROT_EXEC, // Permissions: R W X
+        MAP_PRIVATE | MAP_ANONYMOUS,
         -1, 0
     );
 
     if (game_code_buffer == MAP_FAILED) {
-        perror("Erreur: Impossible d'allouer de la mémoire exécutable avec mmap");
+        perror("ERROR: Unable to allow memory\n");
         fclose(game_file);
         return 1;
     }
 
-    // 3. Copier le code du jeu dans le buffer exécutable
+    // Copy game binary into the executable memory area
     if (fread(game_code_buffer, 1, file_size, game_file) != file_size) {
-        fprintf(stderr, "Erreur lors de la lecture du fichier dans le buffer.\n");
+        fprintf(stderr, "ERROR: unable to read the file into the buffer\n");
         fclose(game_file);
         munmap(game_code_buffer, file_size);
         return 1;
     }
     fclose(game_file);
 
-    // 4. Préparer l'appel au jeu
-    printf("Code du jeu chargé à l'adresse mémoire %p\n", game_code_buffer);
+    // Prepare game_start call
+    printf("Game code loaded at %p\n", game_code_buffer);
     
-    // Création d'un pointeur de fonction vers le début du code du jeu.
-    // L'ARM Cortex-M0+ du Pico utilise le jeu d'instructions Thumb.
-    // Pour indiquer un saut en mode Thumb, l'adresse doit avoir son bit 0 à 1.
-    void (*game_main_ptr)(os_api_t*) = (void (*)(os_api_t*))((uintptr_t)game_code_buffer | 1);
+    void (*game_main_ptr)(os_api_t*) = (void (*)(os_api_t*))((uintptr_t)game_code_buffer | 1);  // '| 1' needed because there is Thumb
 
-    printf("Lancement de game_main à l'adresse 0x%lx...\n\n", (uintptr_t)game_main_ptr);
+    printf("Launching game_main at 0x%lx...\n\n", (uintptr_t)game_main_ptr);
     
-    // 5. Appeler le jeu !
-    // QEMU va maintenant commencer à exécuter les instructions ARM de game.bin.
-    // L'argument &emu_api_table (passé via le registre R0 par le compilateur)
-    // donnera au jeu l'accès à nos fonctions simulées.
+
     game_main_ptr(&emu_api_table);
     
-    printf("\n<<< game_main() a retourné. Fin de l'émulation.\n");
+    printf("\n<<< game_main() returned. End of emulation.\n");
 
-    // Libérer la mémoire
+    // Free memory
     munmap(game_code_buffer, file_size);
 
     return 0;
