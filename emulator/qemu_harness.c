@@ -10,6 +10,13 @@ USAGE: qemu-arm ./qemu_harness path_to_game.bin
 COMPILATION : make -f Makefile.qemu
 */
 
+// COMMUNICATION FORMAT : CMD:arg1,arg2,...
+
+void setup_io() {  // Disable stdout and stderr buffering to have instantaneous communication between C and Python
+    setvbuf(stdout, NULL, _IOLBF, 0);
+    setvbuf(stderr, NULL, _IOLBF, 0);
+}
+
 #pragma region OS_API_FUNCTIONS
 // DEBUG / HW
 // QEMU will redirect the printf to the user shell
@@ -23,36 +30,36 @@ int emu_print_serial(const char *format, ...) {
 }
 
 void emu_backlight_state(char state) {
-    printf("[API_CALL] backlight_state(state: %d)\n", state);
+    printf("API:backlight:%d\n", state);
 }
 
 // GRAPHICS
 void emu_flush_render_buffer(void) {
-    printf("[API_CALL] flush_render_buffer()\n");
+    printf("API:flush\n");
 }
 
 void emu_set_px(const uint16_t x_pos, const uint16_t y_pos, const uint16_t color) {
-    printf("[API_CALL] set_px(x: %u, y: %u, color: 0x%04X)\n", x_pos, y_pos, color);
+    printf("API:set_px:%u,%u,%u\n", x_pos, y_pos, color);
 }
 
 uint16_t emu_get_px(const uint16_t x_pos, const uint16_t y_pos) {
-    printf("[API_CALL] get_px(x: %u, y: %u)\n", x_pos, y_pos);
+    printf("[DBG API_CALL] get_px(x: %u, y: %u)\n", x_pos, y_pos);
     return 0;
 }
 
 void emu_put_sprite(const uint16_t x_pos, const uint16_t y_pos, const uint16_t width, const uint16_t height, const uint16_t *sprite) {
-    printf("[API_CALL] put_sprite(x: %u, y: %u, w: %u, h: %u, sprite_ptr: %p)\n", x_pos, y_pos, width, height, sprite);
+    printf("[DBG API_CALL] put_sprite(x: %u, y: %u, w: %u, h: %u, sprite_ptr: %p)\n", x_pos, y_pos, width, height, sprite);
 }
 
 // INPUTS
 char emu_get_btn(const uint32_t button) {
-    printf("[API_CALL] get_btn(button_pin: %u)\n", button);
+    printf("[DBG API_CALL] get_btn(button_pin: %u)\n", button);
     return 0;
 }
 
 // MISC
 uint32_t emu_get_rand_32(void) {
-    printf("[API_CALL] get_rand_32()\n");
+    printf("[DBG API_CALL] get_rand_32()\n");
     return rand();
 }
 
@@ -133,11 +140,13 @@ int main(int argc, char *argv[]) {
     void (*game_main_ptr)(os_api_t*) = (void (*)(os_api_t*))((uintptr_t)game_code_buffer | 1);  // '| 1' needed because there is Thumb
 
     printf("Launching game_main at 0x%lx...\n\n", (uintptr_t)game_main_ptr);
+    printf("CTL:ready\n");
     
 
     game_main_ptr(&emu_api_table);
-    
+
     printf("\n<<< game_main() returned. End of emulation.\n");
+    printf("CTL:done\n");
 
     // Free memory
     munmap(game_code_buffer, file_size);
