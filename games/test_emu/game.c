@@ -22,5 +22,13 @@ void game_main(os_api_t* api) {
     }
 
     api->flush_render_buffer();
+
+    while (!api->get_btn(BTN_A)) {}
+
+    for (int i=0; i<100; i++) {
+        api->set_px(i+10, 10, 0xF100);
+    }
+
+    api->flush_render_buffer();
     return;
 }

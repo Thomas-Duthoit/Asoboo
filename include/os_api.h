@@ -24,12 +24,13 @@ void game_main(os_api_t* api) {  // game entry point
 #include <stdint.h>
 #include <stddef.h>
 
-#define PIN_BTN_A     14
-#define PIN_BTN_B     13
-#define PIN_BTN_UP    11
-#define PIN_BTN_DOWN  9
-#define PIN_BTN_LEFT  10
-#define PIN_BTN_RIGHT 12
+#define BTN_A     14
+#define BTN_B     13
+#define BTN_UP    11
+#define BTN_DOWN  9
+#define BTN_LEFT  10
+#define BTN_RIGHT 12
+#define BTN_HOME  8
 
 typedef struct 
 {

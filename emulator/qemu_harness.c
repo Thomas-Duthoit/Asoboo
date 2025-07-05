@@ -53,13 +53,21 @@ void emu_put_sprite(const uint16_t x_pos, const uint16_t y_pos, const uint16_t w
 
 // INPUTS
 char emu_get_btn(const uint32_t button) {
-    printf("[DBG API_CALL] get_btn(button_pin: %u)\n", button);
+    printf("API:get_btn:%u\n", button);
+
+    char response_buffer[16];
+    if (fgets(response_buffer, sizeof(response_buffer), stdin) != NULL) {
+        if (strncmp(response_buffer, "1", 1) == 0) {
+            return 1;
+        }
+    }
     return 0;
 }
 
 // MISC
 uint32_t emu_get_rand_32(void) {
-    printf("[DBG API_CALL] get_rand_32()\n");
+    printf("API:get_rand_32\n");
+    // TODO: finish
     return rand();
 }
 
@@ -76,6 +84,8 @@ int main(int argc, char *argv[]) {
     FILE* game_file = NULL;
     void* game_code_buffer = NULL;
     long file_size = 0;
+
+    setup_io();  // to disable buffering
 
     printf("[ QEMU ARM Harness - Asoboo ]\n");
 
