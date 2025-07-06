@@ -3,7 +3,9 @@
 
 #include "driver_screen.h"
 
-#define get_buff_idx(x, y)  SCREEN_WIDTH * y_pos + x_pos  // macro function to convert x;y pos to buffer index
+#define get_buff_idx(x, y)  SCREEN_WIDTH * y + x  // macro function to convert x;y pos to buffer index
+#define endianswap16(x) (((x) >> 8) | ((x) << 8))
+
 
 uint16_t render_buffer[SCREEN_HEIGHT*SCREEN_WIDTH];  // primary render buffer
 
@@ -32,13 +34,13 @@ void graph_flush_render_buffer(void) {
 
 void graph_set_px (const uint16_t x_pos, const uint16_t y_pos, const uint16_t color) {
     if ((x_pos >= 0 && x_pos < SCREEN_WIDTH) && (y_pos >= 0 && y_pos < SCREEN_HEIGHT)) 
-        render_buffer[get_buff_idx(x_pos, y_pos)] = color;
+        render_buffer[get_buff_idx(x_pos, y_pos)] = endianswap16(color);
 }
 
 
 uint16_t graph_get_px (const uint16_t x_pos, const uint16_t y_pos) {
     if ((x_pos >= 0 && x_pos < SCREEN_WIDTH) && (y_pos >= 0 && y_pos < SCREEN_HEIGHT))
-        return render_buffer[get_buff_idx(x_pos, y_pos)];
+        return endianswap16(render_buffer[get_buff_idx(x_pos, y_pos)]);
     else
         return 0;
 }
@@ -53,7 +55,7 @@ void graph_put_sprite (const uint16_t x_pos, const uint16_t y_pos, const uint16_
             uint16_t screen_x = x_pos + x;
             if (screen_x >= SCREEN_WIDTH) continue; // Avoid horizontal overflow
 
-            render_buffer[get_buff_idx(screen_x, screen_y)] = sprite[y * width + x];
+            render_buffer[get_buff_idx(screen_x, screen_y)] = endianswap16(sprite[y * width + x]);
         }
     }
 }
@@ -67,7 +69,7 @@ void graph_fill_rect (const uint16_t x_pos, const uint16_t y_pos, const uint16_t
             uint16_t screen_x = x_pos + x;
             if (screen_x >= SCREEN_WIDTH) continue; // Avoid horizontal overflow
 
-            render_buffer[get_buff_idx(screen_x, screen_y)] = color;
+            render_buffer[get_buff_idx(screen_x, screen_y)] = endianswap16(color);
         }
     }
 }
