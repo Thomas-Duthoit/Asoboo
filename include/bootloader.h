@@ -3,6 +3,7 @@
 
 #include "os_api.h"
 #include "init_hardware.h"
+#include "pico/rand.h"
 #include "graph.h"
 #include "ff.h"
 
@@ -22,7 +23,7 @@ os_api_t os_api_table = {  // Assigning functions to the shared funnctions table
     .put_sprite = graph_put_sprite,
     .get_btn = get_btn_state,
 
-    .get_rand_32 = NULL,
+    .get_rand_32 = get_rand_32,
 };
 
 // load and execute the binary located at the given path
@@ -44,6 +45,9 @@ void load_game(const char* path) {
     // For Thumb (which is needed for the pico), add 1 to the address
     game_main = (void (*)(os_api_t *))(GAME_CODE_ADDR | 1);
 
+    // Clear and flush render buffer
+    graph_fill_rect(0, 0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1, 0);
+    graph_flush_render_buffer();
     /* Small manipulation in assembly :
         To prevent the game code located in ram from beeing corrupted by the stack, we move the stack pointer below the game address.
         When the game execution has ended, the stack is restored.

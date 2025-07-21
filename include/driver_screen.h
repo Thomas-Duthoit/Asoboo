@@ -5,8 +5,8 @@
 #include "hardware/spi.h"
 #include "cs_manager.h"
 
-#define SCREEN_WIDTH  160
-#define SCREEN_HEIGHT 128
+#define SCREEN_WIDTH  320
+#define SCREEN_HEIGHT 240
 #define SCREEN_X_OFF 1
 #define SCREEN_Y_OFF 2
 
@@ -103,7 +103,8 @@ char init_screen() {
 
     // Memory Data Access Control
     screen_write_command(CMD_MADCTL);
-    screen_write_data(&(uint8_t){0b10100000}, 1);  // MX | MV
+    // screen_write_data(&(uint8_t){0b10100000}, 1);  // MX | MV
+    screen_write_data(&(uint8_t){0xC0}, 1);  // MX | MV
 
     // Pixel Format Set
     screen_write_command(CMD_COLMOD);
