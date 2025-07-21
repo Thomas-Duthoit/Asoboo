@@ -5,7 +5,7 @@ import sys
 import pygame
 
 
-GAME_BIN_PATH = "../games/flappy/game.bin"
+GAME_BIN_PATH = "../games/snake/game.bin"
 HARNESS_EXECUTABLE = "./qemu_harness"
 QEMU_COMMAND = ["qemu-arm", "-L", "/usr/arm-linux-gnueabihf/", HARNESS_EXECUTABLE, GAME_BIN_PATH]
 
@@ -80,7 +80,7 @@ def parse_line(line):
     parts = line.strip().split(':')
     command = parts[0]
 
-    print(GREEN + f"[DBG]: {line.strip()} ", END)
+    # print(GREEN + f"[DBG]: {line.strip()} ", END)
     
     if command == "API":
         api_call = parts[1]

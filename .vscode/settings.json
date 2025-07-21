@@ -50,6 +50,8 @@
         "typeinfo": "cpp",
         "type_traits": "cpp",
         "init_hardware.h": "c",
-        "sstream": "c"
+        "sstream": "c",
+        "os_api.h": "c",
+        "stdint.h": "c"
     }
 }
