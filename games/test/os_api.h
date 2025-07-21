@@ -35,7 +35,7 @@ void game_main(os_api_t* api) {  // game entry point
 typedef struct 
 {
     // DEBUG / HW
-    int (*print_serial)(const char *, ...);  // printf through USB serial
+    int (*print_serial)(const char *, ...);        // printf through USB serial
     void (*backlight_state)(char);                 // control display backlight (0=off, 1=on)
 
     // GRAPHICS

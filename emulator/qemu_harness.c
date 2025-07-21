@@ -10,6 +10,9 @@ USAGE: qemu-arm ./qemu_harness path_to_game.bin
 COMPILATION : make -f Makefile.qemu
 */
 
+#define GAME_CODE_ADDR ((void*)0x20030000)
+void* game_code_buffer = NULL;
+
 // COMMUNICATION FORMAT : CMD:arg1,arg2,...
 
 void setup_io() {  // Disable stdout and stderr buffering to have instantaneous communication between C and Python
@@ -54,7 +57,21 @@ uint16_t emu_get_px(const uint16_t x_pos, const uint16_t y_pos) {
 }
 
 void emu_put_sprite(const uint16_t x_pos, const uint16_t y_pos, const uint16_t width, const uint16_t height, const uint16_t *sprite) {
-    printf("[DBG API_CALL] put_sprite(x: %u, y: %u, w: %u, h: %u, sprite_ptr: %p)\n", x_pos, y_pos, width, height, sprite);
+    if (!game_code_buffer) return; // safer access
+
+    // get offset from game start
+    uintptr_t sprite_offset = (uintptr_t)sprite - (uintptr_t)GAME_CODE_ADDR;
+
+    // get real pointer in harness
+    const uint16_t* host_sprite_ptr = (const uint16_t*)((uintptr_t)game_code_buffer + sprite_offset);
+
+    // use the pointer to access data
+    for (uint16_t y = 0; y < height; y++) {
+        for (uint16_t x = 0; x < width; x++) {
+            uint16_t color = host_sprite_ptr[y * width + x];
+            emu_set_px(x_pos + x, y_pos + y, color);
+        }
+    }
 }
 
 // INPUTS
@@ -87,7 +104,6 @@ int main(int argc, char *argv[]) {
     }
     const char* game_path = argv[1];
     FILE* game_file = NULL;
-    void* game_code_buffer = NULL;
     long file_size = 0;
 
     setup_io();  // to disable buffering
@@ -101,10 +117,11 @@ int main(int argc, char *argv[]) {
         .flush_render_buffer = emu_flush_render_buffer,
         .set_px = emu_set_px,
         .get_px = emu_get_px,
-        .put_sprite = emu_put_sprite,
+        .put_sprite = emu_put_sprite,           
         .get_btn = emu_get_btn,
         .get_rand_32 = emu_get_rand_32,
     };
+
     
     // Open binary file
     game_file = fopen(game_path, "rb");
@@ -127,7 +144,7 @@ int main(int argc, char *argv[]) {
     // Allow executable memory for the game code
     // malloc allows non-executable memory, so we need to use mmap
     game_code_buffer = mmap(
-        NULL, // The system choose the adress
+        GAME_CODE_ADDR, // The system choose the adress
         file_size, // Region size
         PROT_READ | PROT_WRITE | PROT_EXEC, // Permissions: R W X
         MAP_PRIVATE | MAP_ANONYMOUS,

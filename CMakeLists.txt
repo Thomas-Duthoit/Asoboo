@@ -49,6 +49,7 @@ pico_enable_stdio_usb(Asoboo 1)
 # Add the standard library to the build
 target_link_libraries(Asoboo
         pico_stdlib
+        pico_rand
         hardware_spi)
 
 # Add the standard include files to the build

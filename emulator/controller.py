@@ -5,7 +5,7 @@ import sys
 import pygame
 
 
-GAME_BIN_PATH = "../games/gradient/game.bin"
+GAME_BIN_PATH = "../games/flappy/game.bin"
 HARNESS_EXECUTABLE = "./qemu_harness"
 QEMU_COMMAND = ["qemu-arm", "-L", "/usr/arm-linux-gnueabihf/", HARNESS_EXECUTABLE, GAME_BIN_PATH]
 
@@ -20,8 +20,8 @@ END = "\033[0m"
 
 
 
-SCREEN_WIDTH = 160
-SCREEN_HEIGHT = 128
+SCREEN_WIDTH = 320
+SCREEN_HEIGHT = 240
 
 
 BUTTONS_MAPPING = {
@@ -36,7 +36,7 @@ BUTTONS_MAPPING = {
     13 : pygame.K_v,  # B
     8 : pygame.K_h,  # HOME
     11 : pygame.K_UP,
-    19 : pygame.K_DOWN,
+    9 : pygame.K_DOWN,
     10 : pygame.K_LEFT,
     12 : pygame.K_RIGHT,
 }
@@ -162,7 +162,7 @@ try:
         QEMU_COMMAND,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        stdin=subprocess.PIPE, # On le garde pour pouvoir envoyer des commandes plus tard
+        stdin=subprocess.PIPE,
         text=True,
         bufsize=1 
     )
