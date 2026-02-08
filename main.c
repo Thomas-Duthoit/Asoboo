@@ -57,6 +57,6 @@ int main() {
 }
 
 void handle_fatal_error() {
-    stdio_printf(">>> FATAL ERROR");
-    // TODO: add something like a reboot
+    stdio_printf(">>> FATAL ERROR -> Reboot");
+    watchdog_reboot(0, 0, 0);
 }

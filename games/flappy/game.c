@@ -1,0 +1,66 @@
+#include "os_api.h"
+
+#define SPRITE_WIDTH 16
+#define SPRITE_HEIGHT 16
+#define BLACK  0x0000
+#define YELLOW 0xFFE0
+
+const uint16_t smiley_sprite_data[SPRITE_HEIGHT * SPRITE_WIDTH] = {
+    BLACK, BLACK, BLACK, BLACK, YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, BLACK, BLACK, BLACK, BLACK,
+    BLACK, BLACK, YELLOW, YELLOW, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, YELLOW, YELLOW, BLACK, BLACK,
+    BLACK, YELLOW, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, YELLOW, BLACK,
+    BLACK, YELLOW, BLACK, BLACK, YELLOW, YELLOW, BLACK, BLACK, YELLOW, YELLOW, BLACK, BLACK, BLACK, BLACK, YELLOW, BLACK,
+    YELLOW, BLACK, BLACK, YELLOW, YELLOW, YELLOW, BLACK, BLACK, YELLOW, YELLOW, YELLOW, BLACK, BLACK, BLACK, YELLOW, YELLOW,
+    YELLOW, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, YELLOW, YELLOW,
+    YELLOW, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, YELLOW, YELLOW,
+    YELLOW, BLACK, BLACK, BLACK, YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, BLACK, BLACK, BLACK, BLACK, YELLOW, YELLOW,
+    YELLOW, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, YELLOW, YELLOW,
+    YELLOW, BLACK, BLACK, YELLOW, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, YELLOW, BLACK, BLACK, YELLOW, YELLOW,
+    BLACK, YELLOW, BLACK, BLACK, YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, BLACK, BLACK, BLACK, YELLOW, BLACK,
+    BLACK, YELLOW, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, YELLOW, BLACK,
+    BLACK, BLACK, YELLOW, YELLOW, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, YELLOW, YELLOW, BLACK, BLACK,
+    BLACK, BLACK, BLACK, BLACK, YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, YELLOW, BLACK, BLACK, BLACK, BLACK,
+    BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
+    BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
+};
+
+__attribute__((used)) __attribute__((section(".text.game_main")))
+void game_main(os_api_t* api) {
+    // 1. Allumer l'écran
+    api->backlight_state(1);
+
+    // 2. Calculer la position et dessiner le sprite
+    uint16_t pos_x = (320 - SPRITE_WIDTH) / 2;
+    uint16_t pos_y = (240 - SPRITE_HEIGHT) / 2;
+    api->put_sprite(pos_x, pos_y, SPRITE_WIDTH, SPRITE_HEIGHT, smiley_sprite_data);
+
+    // 3. Afficher le résultat
+    api->flush_render_buffer();
+
+    // 4. Boucle principale du jeu : attend que le bouton A soit pressé
+    // C'est une bien meilleure pratique qu'une boucle vide.
+    while (1) {
+        // On demande l'état du bouton A (ID: 14), qui est une clé valide.
+        if (api->get_btn(BTN_A)) {
+            break; // Sort de la boucle si le bouton A est pressé
+        }
+
+        if (api->get_btn(BTN_RIGHT)) {
+            pos_x+=1; // Sort de la boucle si le bouton A est pressé
+        }
+        if (api->get_btn(BTN_LEFT)) {
+            pos_x-=1; // Sort de la boucle si le bouton A est pressé
+        }
+        if (api->get_btn(BTN_DOWN)) {
+            pos_y+=1; // Sort de la boucle si le bouton A est pressé
+        }
+        if (api->get_btn(BTN_UP)) {
+            pos_y-=1; // Sort de la boucle si le bouton A est pressé
+        }
+        api->put_sprite(pos_x, pos_y, SPRITE_WIDTH, SPRITE_HEIGHT, smiley_sprite_data);
+        api->flush_render_buffer();
+    }
+
+    // Le jeu se termine proprement.
+    return;
+}

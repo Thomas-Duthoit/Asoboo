@@ -7,7 +7,7 @@ LD = arm-none-eabi-ld
 OBJCOPY = arm-none-eabi-objcopy
 
 # Flags
-CFLAGS = -mcpu=cortex-m0plus -mthumb -nostdlib -ffreestanding -Wall -Os
+CFLAGS = -mcpu=cortex-m0plus -mthumb -nostdlib -ffreestanding -Wall -Os -fno-jump-tables
 LDFLAGS = -Ttext=0x20030000 --gc-sections
 
 all: $(TARGET).bin

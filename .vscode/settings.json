@@ -49,6 +49,9 @@
         "string_view": "cpp",
         "typeinfo": "cpp",
         "type_traits": "cpp",
-        "init_hardware.h": "c"
+        "init_hardware.h": "c",
+        "sstream": "c",
+        "os_api.h": "c",
+        "stdint.h": "c"
     }
 }

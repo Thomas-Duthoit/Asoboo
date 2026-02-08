@@ -3,6 +3,11 @@
 #include "layout.h"
 #include "hardware/spi.h"
 
+/*
+Since there is two components on the same SPI bus, we need to switch the chip select (CS) pins for each module
+The baudrate is also set higher for the screen to have a smooth render with more fps
+*/
+
 static inline void cs_select_screen() {
     gpio_put(PIN_CS_SCREEN, 0);
     gpio_put(PIN_CS_SD, 1);

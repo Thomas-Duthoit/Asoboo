@@ -12,7 +12,7 @@
 
 
 void init_hardware() {
-    // Initialisation des boutons
+    // BUTTONS HW INIT (pulled up)
     gpio_init(PIN_BTN_A);
     gpio_init(PIN_BTN_B);
     gpio_init(PIN_BTN_UP);
@@ -37,6 +37,7 @@ void init_hardware() {
     gpio_pull_up(PIN_BTN_RIGHT);
     gpio_pull_up(PIN_BTN_HOME);
 
+    // SPI BUS AND CS HW INIT
     spi_init(SPI_PORT, SPI_BAUDRATE);
     gpio_set_function(PIN_MISO, GPIO_FUNC_SPI);
     gpio_set_function(PIN_MOSI, GPIO_FUNC_SPI);
@@ -44,12 +45,12 @@ void init_hardware() {
 
     gpio_init(PIN_CS_SCREEN);
     gpio_set_dir(PIN_CS_SCREEN, GPIO_OUT);
-    gpio_put(PIN_CS_SCREEN, 1); // Désactiver l'écran par défaut
+    gpio_put(PIN_CS_SCREEN, 1); // Screen is disabled
     gpio_init(PIN_CS_SD);
     gpio_set_dir(PIN_CS_SD, GPIO_OUT);
-    gpio_put(PIN_CS_SD, 1); // Désactiver la carte SD par défaut
+    gpio_put(PIN_CS_SD, 1); // uSD is disabled
 
-    // Initialisation de l'écran
+    // SCREEN HW INIT
     gpio_init(PIN_DC);
     gpio_set_dir(PIN_DC, GPIO_OUT);
     gpio_init(PIN_RST);
@@ -57,38 +58,17 @@ void init_hardware() {
     gpio_init(PIN_BL);
     gpio_set_dir(PIN_BL, GPIO_OUT);
     
-    // Initialisation du buzzer
+    // BUZZER HW INIT
     gpio_init(PIN_BUZ);
     gpio_set_dir(PIN_BUZ, GPIO_OUT);
 
-    // Initialisation de la led
+    // LED HW INIT
     gpio_init(PIN_LED);
     gpio_set_dir(PIN_LED, GPIO_OUT);
 
-    // Ecran
+    // SCREEN
     init_screen();
-
-    // Reset + Allumage
-    // uint16_t img[SCREEN_WIDTH*SCREEN_HEIGHT] = _BOOT_IMAGE;
-    // g_draw_buffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, img);
-    // _render_boot_img();
     screen_backlight(1);
 
-
-    // uSD
-    // if (!init_fatfs()) {
-    //     spi_init(SPI_PORT, SPI_BAUDRATE);
-    //     // g_fill_rect(0, 0, SCREEN_WIDTH-1, SCREEN_HEIGHT-1, RED);
-    //     // g_fill_rect(2, 2, SCREEN_WIDTH-3, SCREEN_HEIGHT-3, BLACK);
-    //     g_draw_string(5, 5, "ERROR:", RED, BLACK);
-    //     g_draw_string(5+FONT_WIDTH*7, 5, "NO SD CARD", WHITE, BLACK);
-    //     g_draw_string(5, 5+FONT_HEIGHT, "<HOME> TO RETRY", WHITE, BLACK);
-
-    //     while (1) {
-    //         tight_loop_contents();
-
-    //         if (get_btn_state(PIN_BTN_HOME)) watchdog_reboot(0, 0, 0);
-    //     }
-    // }
 }
 #endif
