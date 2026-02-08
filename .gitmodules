@@ -1,3 +1,0 @@
-[submodule "lib/FatFs"]
-	path = lib/FatFs
-	url = https://github.com/stm32duino/FatFs.git
