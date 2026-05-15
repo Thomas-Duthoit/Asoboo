@@ -22,28 +22,87 @@ public:
         auto panel_cfg = _panel_instance.config();
         panel_cfg.pin_cs = LCD_CS;
         panel_cfg.pin_rst = LCD_RST;
-        panel_cfg.panel_width = SCR_WIDTH;
-        panel_cfg.panel_height = SCR_HEIGHT;
+        // panel_cfg.panel_width = SCR_WIDTH;
+        // panel_cfg.panel_height = SCR_HEIGHT;
         _panel_instance.config(panel_cfg);
         setPanel(&_panel_instance);
     }
 };
 
-AsobooDisplay display;
+class AsobooGFX
+{
+private:
+    AsobooDisplay display;
+    LGFX_Sprite buffers[2];  // double buffering
+    uint8_t currentBuffer = 0;
+
+public:
+    void init() {
+        display.init();
+        display.setRotation(1);
+
+        for (int i = 0; i < 2; i++) {
+            buffers[i].setPsram(true); // PSRAM allocation
+            buffers[i].setColorDepth(16); // RGB565
+            buffers[i].createSprite(SCR_WIDTH, SCR_HEIGHT);
+        }
+        Serial.println("[Asoboo] GFX Engine Ready");
+    }
+
+
+    LGFX_Sprite* getCanvas() {  // get the current drawing buffer
+        return &buffers[currentBuffer];
+    }
+
+
+    void displayFrame() {  // push buffer to screen and switch to next one
+
+        display.waitDisplay();
+        
+        buffers[currentBuffer].pushSprite(&display, 0, 0);
+
+        currentBuffer = 1 - currentBuffer;  // switch to new buffer while the other one is beeing sent
+
+
+
+    }
+};
+
+AsobooGFX GFX;
+
 
 void setup() {
     Serial.begin(115200);
 
-    display.init();
-    display.setRotation(1);
-    display.fillScreen(TFT_BLACK);
+    Serial.println("[Asoboo] Kernel initialization...");
+
+    GFX.init();
+
+    Serial.println("[Asoboo] Kernel initialized...");
+
 }
 
 void loop() {
-    display.fillScreen(TFT_RED);
-    display.print("RED");
-    delay(1000);
-    display.fillScreen(TFT_GREEN);
-    display.print("GREEN");
-    delay(1000);
+    static uint32_t lastMillis = 0;
+    static uint32_t frameCount = 0;
+    
+    LGFX_Sprite* canvas = GFX.getCanvas();
+    
+    canvas->fillSprite(TFT_BLACK);
+    
+    static int x = 0;
+    canvas->fillRoundRect(x, 100, 60, 60, 10, TFT_GOLD);
+    canvas->drawRect(0, 0, 320, 240, TFT_WHITE);
+    
+    x = (x + 3) % 320;
+
+    // FPS
+    frameCount++;
+    if (millis() - lastMillis >= 1000) {
+        Serial.printf("FPS: %d\n", frameCount);
+        frameCount = 0;
+        lastMillis = millis();
+    }
+
+    GFX.displayFrame();
 }
