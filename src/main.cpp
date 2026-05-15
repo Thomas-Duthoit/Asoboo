@@ -3,11 +3,11 @@
 #include <LovyanGFX.hpp>
 #include "asoboo_hw.h"
 
-class LGFX_Asoboo : public lgfx::LGFX_Device {
+class AsobooDisplay : public lgfx::LGFX_Device {
     lgfx::Panel_ILI9341 _panel_instance;
     lgfx::Bus_Parallel8 _bus_instance;
 public:
-    LGFX_Asoboo() {
+    AsobooDisplay() {
         auto bus_cfg = _bus_instance.config();
         bus_cfg.port = 0;
         bus_cfg.freq_write = LCD_FREQ;
@@ -22,12 +22,14 @@ public:
         auto panel_cfg = _panel_instance.config();
         panel_cfg.pin_cs = LCD_CS;
         panel_cfg.pin_rst = LCD_RST;
+        panel_cfg.panel_width = SCR_WIDTH;
+        panel_cfg.panel_height = SCR_HEIGHT;
         _panel_instance.config(panel_cfg);
         setPanel(&_panel_instance);
     }
 };
 
-LGFX_Asoboo display;
+AsobooDisplay display;
 
 void setup() {
     Serial.begin(115200);
